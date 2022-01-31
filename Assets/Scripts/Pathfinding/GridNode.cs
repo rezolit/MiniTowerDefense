@@ -2,21 +2,33 @@
 
 namespace Pathfinding
 {
-	public class GridNode
+	public class GridNode : IHeapItem<GridNode>
 	{
 		public bool       IsWalkable { get; }
-		public Vector3    WorldPosition { get; }
 		public int        GCost { get; set; }
 		public int        HCost { get; set; }
+		public int        HeapIndex { get; set; }
+		public Vector3    WorldPosition { get; }
+		public Vector2Int GridPos { get; private set; }
 		public GridNode   Parent { get; set; }
-		public Vector2Int GridPos { get; set; }
-		public int        FCost => GCost + HCost;
+		
+		private int       FCost => GCost + HCost;
 
-		public GridNode(bool _isWalkable, Vector3 _worldPosition, Vector2Int _gridPos)
+		public GridNode(bool isWalkable, Vector3 worldPosition, Vector2Int gridPos)
 		{
-			IsWalkable = _isWalkable;
-			WorldPosition = _worldPosition;
-			GridPos = _gridPos;
+			IsWalkable = isWalkable;
+			WorldPosition = worldPosition;
+			GridPos = gridPos;
+		}
+
+		public int CompareTo(GridNode other)
+		{
+			int compareResult = FCost.CompareTo(other.FCost);
+			if (compareResult == 0) {
+				compareResult = HCost.CompareTo(other.HCost);
+			}
+
+			return -compareResult;
 		}
 	}
 }

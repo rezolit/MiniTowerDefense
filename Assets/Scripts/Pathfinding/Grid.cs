@@ -24,13 +24,13 @@ namespace Pathfinding
 		[SerializeField]
 		private bool showGrid;
 
-		public List<GridNode> Path { get; set; }
-		
-		
 		private GridNode[,] _grid;
 		private float _nodeHalfSize;
 		private Vector2Int _nodesCount;
 
+		public List<GridNode> Path { get; set; }
+		public int MaxSize => _nodesCount.x * _nodesCount.y;
+		
 		private void Start()
 		{
 			_nodeHalfSize = nodeSize / 2.0f;
@@ -44,10 +44,11 @@ namespace Pathfinding
 		private void CreateGrid()
 		{
 			_grid = new GridNode[_nodesCount.x, _nodesCount.y];
+			var position = transform.position;
 			Vector3 leftHigherBorder = new Vector3(
-				transform.position.x - gridSize.x / 2,
-				transform.position.y,
-				transform.position.z - gridSize.y / 2);
+				position.x - gridSize.x / 2,
+				position.y,
+				position.z - gridSize.y / 2);
 			
 
 			for (int i = 0; i < _nodesCount.x; i++) {
@@ -102,7 +103,7 @@ namespace Pathfinding
 				
 				foreach (var node in _grid) {
 					Gizmos.color = node.IsWalkable ? Color.green : Color.red;
-					if (Path.Contains(node)) {
+					if (Path != null && Path.Contains(node)) {
 						Gizmos.color = Color.magenta;
 					}
 					Gizmos.DrawCube(node.WorldPosition, Vector3.one * nodeSize);

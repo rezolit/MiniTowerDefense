@@ -21,9 +21,6 @@ namespace Pathfinding
 		[SerializeField]
 		private Transform targetTo;
 
-		[SerializeField]
-		private bool showPath;
-
 		private void Awake()
 		{
 			_grid = GetComponent<Grid>();
@@ -39,22 +36,13 @@ namespace Pathfinding
 			GridNode nodeFrom = _grid.GetGridNodeFromWorldPosition(from);
 			GridNode nodeTo = _grid.GetGridNodeFromWorldPosition(to);
 
-			List<GridNode> openNodes = new List<GridNode>();
+			Heap<GridNode> openNodes = new Heap<GridNode>(_grid.MaxSize);
 			HashSet<GridNode> closedNodes = new HashSet<GridNode>();
 			openNodes.Add(nodeFrom);
 
 			while (openNodes.Count > 0) {
 				
-				GridNode currentNode = openNodes[0];
-				for (int i = 1; i < openNodes.Count; ++i) {
-					if (openNodes[i].FCost < currentNode.FCost ||
-					    openNodes[i].FCost == currentNode.FCost &&
-					    openNodes[i].HCost < currentNode.HCost) {
-						
-						currentNode = openNodes[i];
-					}
-				}
-				openNodes.Remove(currentNode);
+				GridNode currentNode = openNodes.RemoveFirst();
 				closedNodes.Add(currentNode);
 
 				if (currentNode == nodeTo) {
@@ -83,18 +71,6 @@ namespace Pathfinding
 			return null;
 		}
 
-		private List<GridNode> RetracePath(GridNode from, GridNode to)
-		{
-			List<GridNode> path = new List<GridNode>();
-			GridNode currentNode = to;
-			while (currentNode != from) {
-				path.Add(currentNode);
-				currentNode = currentNode.Parent;
-			}
-
-			return path;
-		}
-
 		private int PathLength(GridNode from, GridNode to)
 		{
 			int distanceX = Math.Abs(from.GridPos.x - to.GridPos.x);
@@ -104,6 +80,18 @@ namespace Pathfinding
 				return diagonalCost * distanceY + directCost * (distanceX - distanceY);
 			}
 			return diagonalCost * distanceX + directCost * (distanceY - distanceX);
+		}
+		
+		private static List<GridNode> RetracePath(GridNode from, GridNode to)
+		{
+			List<GridNode> path = new List<GridNode>();
+			GridNode currentNode = to;
+			while (currentNode != from) {
+				path.Add(currentNode);
+				currentNode = currentNode.Parent;
+			}
+
+			return path;
 		}
 	}
 }
